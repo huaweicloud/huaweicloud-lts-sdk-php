@@ -1,0 +1,56 @@
+{
+  "name": "huaweicloud/lts-sdk-php-demo",
+  "description": "HUAWEICLOUD LTS PHP SDK DEMO",
+  "keywords": [
+    "php",
+    "sdk",
+    "rest",
+    "api",
+    "lts",
+    "demo"
+  ],
+  "version": "1.0.0",
+  "type": "library",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "lts",
+      "email": "fanxin@huawei.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.2.5",
+    "guzzlehttp/guzzle": "6.3.1",
+    "guzzlehttp/psr7": "1.4.2",
+    "guzzlehttp/promises": "1.3.1",
+    "psr/http-message": "1.0.1",
+    "monolog/monolog": ">=2.4.0",
+    "ext-json": "*",
+    "ext-sysvmsg": "*",
+    "ext-parallel": "*",
+    "ext-pthreads": "*"
+  },
+  "config": {
+    "secure-http": false
+  },
+  "repositories": {
+    "packagist": {
+      "type": "composer",
+      "url": "http://mirrors.tools.huawei.com/php/"
+    }
+  },
+  "autoload": {
+    "classmap": [
+      "src/Auth",
+      "src/demo",
+      "src/http",
+      "src/model",
+      "src/util",
+      "src/consumer",
+      "vendor/guzzlehttp",
+      "vendor/monolog",
+      "vendor/phar-io"
+    ]
+  }
+}
