@@ -29,27 +29,10 @@ class Signer
         $this->Secret = $Secret;
     }
 
-
-    /**
-     * @param string $Key
-     */
-    public function setKey($Key)
+    private function searchHeader($requestParam, $requestHeader)
     {
-        $this->Key = $Key;
-    }
-
-    /**
-     * @param string $Secret
-     */
-    public function setSecret($Secret)
-    {
-        $this->Secret = $Secret;
-    }
-
-    private function findHeader($request, $header)
-    {
-        foreach ($request->headerParams as $key => $value) {
-            if (!strcasecmp($key, $header)) {
+        foreach ($requestParam->headerParams as $key => $value) {
+            if (!strcasecmp($key, $requestHeader)) {
                 return $value;
             }
         }
@@ -57,38 +40,38 @@ class Signer
         return null;
     }
 
-    private function CanonicalRequest($request, $signedHeaders)
+    private function LtsCanonicalHttpRequest($request, $signedLtsHeaders)
     {
-        $CanonicalURI = $this->CanonicalURI($request);
-        $CanonicalQueryString = $this->CanonicalQueryString($request);
-        $canonicalHeaders = $this->CanonicalHeaders($request, $signedHeaders);
-        $signedHeadersString = join(';', $signedHeaders);
-        $hash = $this->findHeader($request, HeaderContentSha256);
+        $CanonicalLtsURI = $this->CanonicalLtsURI($request);
+        $CanonicalLtsQueryString = $this->CanonicalLtsQueryString($request);
+        $canonicalLtsHeaders = $this->CanonicalLtsHeaders($request, $signedLtsHeaders);
+        $signedLtsHeadersString = join(';', $signedLtsHeaders);
+        $hash = $this->searchHeader($request, HeaderContentSha256);
         if (!$hash) {
             $hash = hash('sha256', $request->body);
         }
 
-        return "$request->method\n$CanonicalURI\n$CanonicalQueryString\n$canonicalHeaders\n$signedHeadersString\n$hash";
+        return "$request->method\n$CanonicalLtsURI\n$CanonicalLtsQueryString\n$canonicalLtsHeaders\n$signedLtsHeadersString\n$hash";
     }
 
     // CanonicalURI returns request uri
-    private function CanonicalURI($r)
+    private function CanonicalLtsURI($r)
     {
-        $pattens = explode('/', $r->url);
+        $urlPattens = explode('/', $r->url);
         $uri = [];
-        foreach ($pattens as $v) {
-            array_push($uri, str_replace(['+', '%7E'], ['%20', '~'], urlencode(($v))));
+        foreach ($urlPattens as $value) {
+            array_push($uri, str_replace(['+', '%7E'], ['%20', '~'], urlencode(($value))));
         }
-        $urlpath = join('/', $uri);
-        if ('/' != substr($urlpath, -1)) {
-            $urlpath = $urlpath . '/';
+        $ltsUrlpath = join('/', $uri);
+        if ('/' != substr($ltsUrlpath, -1)) {
+            $ltsUrlpath = $ltsUrlpath . '/';
         }
 
-        return $urlpath;
+        return $ltsUrlpath;
     }
 
     // CanonicalQueryString
-    private function CanonicalQueryString($r)
+    private function CanonicalLtsQueryString($r)
     {
         $keys = [];
         foreach ($r->queryParams as $key => $value) {
@@ -120,7 +103,7 @@ class Signer
     }
 
     // CanonicalHeaders
-    private function CanonicalHeaders($r, $signedHeaders)
+    private function CanonicalLtsHeaders($r, $signedHeaders)
     {
         $headers = [];
         foreach ($r->headerParams as $key => $value) {
@@ -180,7 +163,7 @@ class Signer
         if ($method != "POST" && $method != "PATCH" && $method != "PUT") {
             $request->Body = "";
         }
-        $date = $this->findHeader($request, HeaderXDate);
+        $date = $this->searchHeader($request, HeaderXDate);
         if ($date) {
             $t = date_create_from_format(BasicDateFormat, $request->headerParams[HeaderXDate], timezone_open("UTC"));
         }
@@ -188,14 +171,14 @@ class Signer
             $t = date_create(null, timezone_open("UTC"));
             $request->headerParams[HeaderXDate] = date_format($t, BasicDateFormat);
         }
-        $queryString = $this->CanonicalQueryString($request);
+        $queryString = $this->CanonicalLtsQueryString($request);
         if ('' != $queryString) {
             $queryString = '?' . $queryString;
         }
 
         $request->headerParams = array_merge(array("Content-Type" => "application/json"), $request->headerParams);
         $signedHeaders = $this->SignedHeaders($request);
-        $canonicalRequest = $this->CanonicalRequest($request, $signedHeaders);
+        $canonicalRequest = $this->LtsCanonicalHttpRequest($request, $signedHeaders);
         $info = date_format($t, DerivedDateFormat) . "/" . $request->region . "/" . AuthServiceName;
         $stringToSign = $this->StringToSignDerived($canonicalRequest, $info, $t);
         $derivationKey = hash_hkdf("sha256", $this->Secret, 32, $info, $this->Key);
