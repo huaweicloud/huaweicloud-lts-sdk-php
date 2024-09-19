@@ -71,47 +71,47 @@ class Signer
     }
 
     // CanonicalQueryString
-    private function CanonicalLtsQueryString($r)
+    private function CanonicalLtsQueryString($ltsQuery)
     {
-        $keys = [];
-        foreach ($r->queryParams as $key => $value) {
-            array_push($keys, $key);
+        $queryKeys = [];
+        foreach ($ltsQuery->queryParams as $index => $queryValue) {
+            array_push($queryKeys, $index);
         }
-        sort($keys);
-        $a = [];
-        foreach ($keys as $key) {
-            $k = str_replace(['+', '%7E'], ['%20', '~'], urlencode($key));
-            $value = $r->queryParams[$key];
-            if (is_array($value)) {
-                sort($value);
-                foreach ($value as $v) {
-                    $kv = "$k=" . str_replace(['+', '%7E'], ['%20',
-                            '~',], urlencode($v));
-                    array_push($a, $kv);
+        sort($queryKeys);
+        $ltsArray = [];
+        foreach ($queryKeys as $queryKey) {
+            $k = str_replace(['+', '%7E'], ['%20', '~'], urlencode($queryKey));
+            $queryValue = $ltsQuery->queryParams[$queryKey];
+            if (is_array($queryValue)) {
+                sort($queryValue);
+                foreach ($queryValue as $item) {
+                    $keyValue = "$k=" . str_replace(['+', '%7E'], ['%20',
+                            '~',], urlencode($item));
+                    array_push($ltsArray, $keyValue);
                 }
             } else {
-                if (!is_string($value)) {
-                    $value = json_encode($value);
+                if (!is_string($queryValue)) {
+                    $queryValue = json_encode($queryValue);
                 }
-                $kv = "$k=" . str_replace(['+', '%7E'], ['%20',
-                        '~',], urlencode($value));
-                array_push($a, $kv);
+                $keyValue = "$k=" . str_replace(['+', '%7E'], ['%20',
+                        '~',], urlencode($queryValue));
+                array_push($ltsArray, $keyValue);
             }
         }
 
-        return join('&', $a);
+        return join('&', $ltsArray);
     }
 
     // CanonicalHeaders
     private function CanonicalLtsHeaders($r, $signedHeaders)
     {
-        $headers = [];
-        foreach ($r->headerParams as $key => $value) {
-            $headers[strtolower($key)] = trim($value);
+        $ltsHeaders = [];
+        foreach ($r->headerParams as $index => $value) {
+            $ltsHeaders[strtolower($index)] = trim($value);
         }
         $a = [];
-        foreach ($signedHeaders as $key) {
-            array_push($a, $key . ':' . $headers[$key]);
+        foreach ($signedHeaders as $signedHeader) {
+            array_push($a, $signedHeader . ':' . $ltsHeaders[$signedHeader]);
         }
 
         return join("\n", $a) . "\n";
@@ -120,13 +120,13 @@ class Signer
     // SignedHeaders
     private function SignedHeaders($r)
     {
-        $a = [];
-        foreach ($r->headerParams as $key => $value) {
-            array_push($a, strtolower($key));
+        $ltsArray = [];
+        foreach ($r->headerParams as $index => $value) {
+            array_push($ltsArray, strtolower($index));
         }
-        sort($a);
+        sort($ltsArray);
 
-        return $a;
+        return $ltsArray;
     }
 
 
