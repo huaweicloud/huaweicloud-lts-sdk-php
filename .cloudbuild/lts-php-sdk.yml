@@ -1,0 +1,17 @@
+version: '2.0'
+params:
+  - name: staticReleaseVersion
+    value: 1.0
+env:
+  label: Fuxi-Build-x86-euler2.2-vpc-nat #配置虚拟机资源池label
+  build_box:
+    fuxi_os: euler #配置工具版本
+    dependencies:
+      lcrp: 4.9.4.1
+
+  # 中间省略
+
+  BUILD:
+    - build_execute:
+        command: echo hello
+        fuxi_image: registry-cbu.huawei.com/fuxi-build-env/30-scaffold/euler2sp2:nobuildbox.25133364.x86_64 #配置伏羲镜像
