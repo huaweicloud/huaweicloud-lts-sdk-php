@@ -1,7 +1,5 @@
 <?php
 /**
- * Copyright 2024 Huawei Technologies Co.,Ltd.
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -10,7 +8,7 @@
  * "LICENSE"); you may not use this file except in compliance
  * with the LICENSE.  You may obtain a copy of the LICENSE at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the LICENSE is distributed on an
